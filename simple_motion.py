@@ -1,6 +1,5 @@
 import open3d as o3d
 import numpy as np
-from numpy.linalg import norm
 
 body = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)
 pos = np.array((0.0,0.0,0.0))
@@ -18,17 +17,23 @@ vis.add_geometry(mesh_coord_frame)
 vis.add_geometry(body)
 vis.add_geometry(tail)
 
-N = 200 # number of frames in the movie
-dt = 0.01
+N = 400 # number of frames in the movie
+dt = 0.005
+
+k = 20
+m = 1
+
+
 for i in range(N):
 
-    acc = np.array((0.0,-9.81,0.0))
+    acc = np.array((0.0,-9.81,0.0)) - k * vel /m 
     dv = acc * dt
-    vel += dv
+    vel = vel + dv
     dr = vel * dt
-    pos += dr
+    pos = pos + dr
 
     body.translate(dr)
+
     tail.points.extend([pos])
     
     vis.update_geometry(body)
