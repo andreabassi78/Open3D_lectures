@@ -24,13 +24,13 @@ def create_hexagon(size):
         )
     return hexagon
 
-def create_hexagon_grid(rows, cols, hex_size, gap=.01):
+def create_hexagon_grid(rows, cols, hex_size):
     # Create a grid of hexagons
     hexagons = o3d.geometry.LineSet()
 
     # Distance factors for hexagon grid layout
     dx = 3 / 2 * hex_size
-    dy = np.sqrt(3) * hex_size + gap
+    dy = np.sqrt(3) * hex_size
 
     for row in range(rows):
         for col in range(cols):
@@ -60,7 +60,7 @@ cols = 10  # Number of columns of hexagons
 frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0]) 
 
 # Create the grid
-hex_grid = create_hexagon_grid(rows, cols, hex_size, gap =0)
+hex_grid = create_hexagon_grid(rows, cols, hex_size)
 pts = np.array(hex_grid.points)
 
 vis = o3d.visualization.Visualizer()
