@@ -26,12 +26,16 @@ acc_centripetal = norm(v)**2/norm(r)
 
 for i in range(N):
 
-    ur = r/norm(r)
-    a = - ur * acc_centripetal
-    v = v + a * dt
+    # update position
     dr = v * dt
     r += dr
     body.translate(dr)
+
+    #update velocity
+    ur = r/norm(r)
+    a = - ur * acc_centripetal
+    v = v + a * dt
+    
     
     tail.points.extend([r])
     vis.update_geometry(body)
