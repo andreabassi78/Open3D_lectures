@@ -58,7 +58,7 @@ for i in range(N):
     body.translate(dr)
     
 
-    # update velocity vector position and direction
+    # update velocity vector arrow position and direction
     vel_arrow.translate(dr)
     delta_angle = norm(dv)/norm(vel)
     R = vel_arrow.get_rotation_matrix_from_axis_angle((0,0,delta_angle))

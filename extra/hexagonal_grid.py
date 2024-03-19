@@ -11,7 +11,7 @@ def create_hexagon(size):
     theta = np.radians(60)
     # Calculate vertices
     vertices = np.array([
-        [np.cos(i * theta), 0, np.sin(i * theta)] for i in range(6)
+        [np.cos(i * theta), np.sin(i * theta), 0.0] for i in range(6)
         ]) * size
     
     # Create lines between adjacent vertices
@@ -30,7 +30,7 @@ def create_hexagon_grid(rows, cols, hex_size, gap=.01):
 
     # Distance factors for hexagon grid layout
     dx = 3 / 2 * hex_size
-    dz = np.sqrt(3) * hex_size + gap
+    dy = np.sqrt(3) * hex_size + gap
 
     for row in range(rows):
         for col in range(cols):
@@ -40,15 +40,15 @@ def create_hexagon_grid(rows, cols, hex_size, gap=.01):
             # Create a hexagon
             hexagon = create_hexagon(hex_size)
             # Translate hexagon to its position in the grid
-            hexagon.translate((col * dx, 0, row * dz + offset))
+            hexagon.translate((col * dx, row * dy + offset, 0.0))
             
             # Merge hexagons
             hexagons += hexagon
 
     pts = np.array(hexagons.points)
     sx= np.mean(pts[:,0])
-    sz= np.mean(pts[:,2])
-    hexagons.translate((-sx,0,-sz))
+    sy= np.mean(pts[:,1])
+    hexagons.translate((-sx,-sy,0))
     
     return hexagons
 
@@ -60,32 +60,39 @@ cols = 10  # Number of columns of hexagons
 frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0]) 
 
 # Create the grid
-hex_grid = create_hexagon_grid(rows, cols, hex_size, gap =0.01)
+hex_grid = create_hexagon_grid(rows, cols, hex_size, gap =0)
 pts = np.array(hex_grid.points)
 
 vis = o3d.visualization.Visualizer()
 vis.create_window(width=768, height=768)
-vis.add_geometry(hex_grid)
-vis.add_geometry(frame)
 
-N = 400
+#vis.add_geometry(frame)
+
+TimePoints = 400
 t = 0
-dt = 0.025
+dt = 1/TimePoints
 
 x = pts[:,0]
 y = pts[:,1]
 z = pts[:,2]
 
-k = 0.5
-f = 0.2
-a = 0.5
+A = 0.4
+r = np.sqrt((x)**2+(y)**2)
+R =np.amax(x)
 
-for i in range(N):
+K =1/2/R
+f = 4  
 
-    r = np.sqrt((x)**2+(z)**2)
-    y = 0.3 * np.sin(2*np.pi*k*r - 2*np.pi*f*t) * np.exp(-r/a)
-    pts[:,1] = y
+vis.add_geometry(hex_grid)
+for i in range(TimePoints):
+
+    a=0.8
+    z = A * np.cos(2*np.pi*K*r-2*np.pi*f*t) * np.exp(-r**2/a**2)
+    pts[:,2] = z
     hex_grid.points = o3d.utility.Vector3dVector(pts)
+
+    R = hex_grid.get_rotation_matrix_from_axis_angle((-np.pi/10,-np.pi/10, 0))
+    hex_grid.rotate(R, center = np.zeros(3)) 
 
     vis.update_geometry(hex_grid)
     vis.poll_events()
