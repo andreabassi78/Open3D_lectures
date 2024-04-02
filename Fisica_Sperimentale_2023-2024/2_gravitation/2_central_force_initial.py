@@ -26,7 +26,7 @@ earth.paint_uniform_color(np.array((0.0, 0.6, 0.4)))
 earth.compute_vertex_normals()
 moon.compute_vertex_normals()
 vis = o3d.visualization.Visualizer()
-vis.create_window()
+vis.create_window(width=768,height=768)
 vis.add_geometry(earth)
 vis.add_geometry(moon)
 

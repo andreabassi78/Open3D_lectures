@@ -76,18 +76,18 @@ x = pts[:,0]
 y = pts[:,1]
 z = pts[:,2]
 
-A = 0.4
+A = 0.1
 r = np.sqrt((x)**2+(y)**2)
 R =np.amax(x)
 
-K =1/2/R
+K =1/R
 f = 4  
 
 vis.add_geometry(hex_grid)
 for i in range(TimePoints):
 
-    a=0.8
-    z = A * np.cos(2*np.pi*K*r-2*np.pi*f*t) * np.exp(-r**2/a**2)
+    
+    z = A * np.sin(2*np.pi*K*r)*np.cos(2*np.pi*f*t) #simulate a standing wave
     pts[:,2] = z
     hex_grid.points = o3d.utility.Vector3dVector(pts)
 

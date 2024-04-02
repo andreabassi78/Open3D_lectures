@@ -1,6 +1,7 @@
 import open3d as o3d
 import numpy as np
 from numpy.linalg import norm
+import matplotlib.pyplot as plt
 
 YELLOW = np.array((0.7,0.6,0.0))
 BLUE = np.array((0.0,0.0,0.8))
@@ -11,7 +12,8 @@ class Body:
         self.radius = radius
         self.pos = pos    
         self.vel = vel
-        self.acc = np.zeros(3)
+        self.acc = np.zeros(3) 
+        #self.acc = np.array((0,-9.81,0))
         self.mass = mass
         self.mesh = o3d.geometry.TriangleMesh.create_sphere(radius)
         self.mesh.paint_uniform_color(color)
@@ -70,7 +72,6 @@ N_molecules = 1000
 molecules = []
 for index in range(N_molecules):
     pos = np.random.uniform(low=-1.0, high=1.0, size=3)
-    # set molecule velocity according to Boltzman Maxwell distribution with mean value 0 ans standard deviation sqrt(kT/m) 
     vel = np.random.normal(loc=0, scale=np.sqrt(k*T/m), size=3)
     molecule = Body(radius=0.00001, color=BLUE, pos=pos, vel=vel, mass=1.0)
     molecules.append(molecule)
@@ -83,24 +84,52 @@ pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(xyz))
 pcd.paint_uniform_color(BLUE)
 vis.add_geometry(pcd)
 
+# Insert pollen in the system
+pos_pollen = np.zeros(3)
+vel_pollen = np.zeros(3)
+vel_pollen = np.array((0.0,0.0,0.0))
+pollen = Body(radius=0.2, color=YELLOW, pos=pos_pollen, vel=vel_pollen, mass=100.0)
+vis.add_geometry(pollen.mesh)
+
 N_frames = 500 # number of frames in the movie
-dt = 0.005
+dt = 0.01
+
+velocities_pollen = np.zeros((N_frames,3))
+times = np.linspace(0,N_frames*dt,N_frames)
 
 for frame in range(N_frames):            
     for i, molecule in enumerate(molecules): 
+        
         molecule.move(dt)
-        bounce(molecule, d=box_size)
+        bounce(molecule, d=1.0)
         # for j in range(i + 1, len(molecules)):
         #     other_molecule = molecules[j]
         #     r = molecule.pos - other_molecule.pos
         #     if norm(r) < (molecule.radius + other_molecule.radius):
         #         elastic_collision(molecule, other_molecule)
         xyz[i,:] = molecule.pos
+        
+        #collisions between molecules and pollen
+        distance = pollen.pos - molecule.pos
+        if norm(distance) < (molecule.radius + pollen.radius):
+            elastic_collision(pollen, molecule)
+
+    pollen.move(dt)
+    bounce(pollen, d=box_size)    
+
+    velocities_pollen[frame,:] = pollen.vel
     
     pcd.points = o3d.utility.Vector3dVector(xyz)
     
     vis.update_geometry(pcd)
+    vis.update_geometry(pollen.mesh)
     vis.poll_events()
     vis.update_renderer()
+
+
+plt.plot(times,np.abs(velocities_pollen))
+plt.xlabel('time')
+plt.ylabel('velocity')
+plt.show()
 
 vis.destroy_window()

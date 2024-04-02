@@ -2,8 +2,8 @@ import open3d as o3d
 import numpy as np
 from numpy.linalg import norm
 
-BLUE = np.array((0.7,0.6,0.0))
-YELLOW = np.array((0.0,0.6,0.8))
+YELLOW = np.array((0.7,0.6,0.0))
+BLUE = np.array((0.0,0.6,0.8))
 
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
