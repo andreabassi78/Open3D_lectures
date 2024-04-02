@@ -51,6 +51,10 @@ for i in range(N):
 
     body0.move(dt)
     body1.move(dt)
+
+    distance = body0.pos - body1.pos
+    if norm(distance) < (body0.radius+body1.radius):
+        print('collision!')
     
     vis.update_geometry(body0.mesh)
     vis.update_geometry(body1.mesh)
