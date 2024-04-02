@@ -9,6 +9,9 @@ def calculate_energy(m0,m1,r0,r1,v0,v1):
     E = K+U
     return E
 
+def calculate_center_of_mass(m0,m1,r0,r1,):
+    cm = (m0*r0 + m1*r1) / (m0+m1)
+    return cm
 
 G = 1.0 # Arbitrary gravitational constant.
 dt = 0.001 # Set temporal sampling in seconds 
@@ -25,10 +28,11 @@ moon.translate(pos_moon)
 # define Earth 
 M = 1000 # mass of the Earth
 radius_earth = 0.1 # size of the Earth
-pos_earth = np.array((0.0, 0.0, 0.0)) 
+#pos_earth = np.array((0.0, 0.0, 0.0)) 
+pos_earth = -pos_moon*m/M # to have center of mass in (0,0,0)
 earth = o3d.geometry.TriangleMesh.create_sphere(radius=radius_earth) 
 earth.paint_uniform_color(np.array((0.0, 0.6, 0.4)))
-vel_earth = -vel*m/M # conservation of momentum
+vel_earth = -vel*m/M # conservation of momentum, to have velocity of center of mass (0,0,0)
 
 # visualization
 earth.compute_vertex_normals()
@@ -63,8 +67,8 @@ for i in range(N):
     vel += acc_moon * dt
     vel_earth += acc_earth *dt
 
-    print(calculate_energy(m,M,pos_moon,pos_earth,vel,vel_earth))
-
+    print('Total mechanical energy:', calculate_energy(m,M,pos_moon,pos_earth,vel,vel_earth))
+    #print('Center of mass:', calculate_center_of_mass(m,M,pos_moon,pos_earth))
     moon_tail.points.extend([pos_moon])
         
     vis.update_geometry(earth)
