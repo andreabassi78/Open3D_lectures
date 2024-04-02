@@ -3,6 +3,13 @@ import numpy as np
 from numpy.linalg import norm
 
 
+def calculate_energy(m0,m1,r0,r1,v0,v1):
+    K = 1/2 * m0 * norm(v0)**2 + 1/2 * m1 * norm(v1)**2 #kinetic energy of the system
+    U = - G*m0*m1/norm(r0-r1) # TODO double check that this is the correct total potential energy of the system
+    E = K+U
+    return E
+
+
 G = 1.0 # Arbitrary gravitational constant.
 dt = 0.001 # Set temporal sampling in seconds 
 
@@ -21,7 +28,7 @@ radius_earth = 0.1 # size of the Earth
 pos_earth = np.array((0.0, 0.0, 0.0)) 
 earth = o3d.geometry.TriangleMesh.create_sphere(radius=radius_earth) 
 earth.paint_uniform_color(np.array((0.0, 0.6, 0.4)))
-# We assume here that the Earth is not moving, only the Moon orbits around the Earth
+vel_earth = -vel*m/M # conservation of momentum
 
 # visualization
 earth.compute_vertex_normals()
@@ -42,12 +49,21 @@ for i in range(N):
     dr = vel * dt
     moon.translate(dr)
     pos_moon += dr
+
+    dr_earth = vel_earth *dt
+    earth.translate(dr_earth)
+    pos_earth += dr_earth
     
     r = pos_moon-pos_earth # position vector of the Moon
     u_r = r/norm(r) # unit vector of the force
     force = - u_r * G*M*m/norm(r)**2.0 # gravitational like force force on the moon
-    acc = force/m
-    vel += acc * dt
+    acc_moon = force/m
+    acc_earth = -force/M
+
+    vel += acc_moon * dt
+    vel_earth += acc_earth *dt
+
+    print(calculate_energy(m,M,pos_moon,pos_earth,vel,vel_earth))
 
     moon_tail.points.extend([pos_moon])
         
