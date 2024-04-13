@@ -33,7 +33,7 @@ def elastic_collision(b0,b1):
 
 def inelastic_collision(b0,b1,dt = 0.01):
     # ball is working as a springs with frinction proportional to velocity                 
-    K = 300 # elastic constant (N/m)
+    K = 100 # elastic constant (N/m)
     B = 5 # damping
     vrel = b0.vel - b1.vel
     rrel = b0.pos - b1.pos
@@ -78,7 +78,7 @@ body1 = Body(radius = 0.1,
 frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0])
 
 vis = o3d.visualization.Visualizer()
-vis.create_window()
+vis.create_window(width=768,height =768)
 vis.add_geometry(frame)
 vis.add_geometry(body0.mesh)
 vis.add_geometry(body1.mesh)
@@ -93,10 +93,10 @@ for i in range(N):
 
     distance = body0.pos - body1.pos
     if norm(distance) < (body0.radius+body1.radius):
-        completely_inelastic_collision(body0, body1)  
+        inelastic_collision(body0, body1)  
         
     print("Kinetic Energy:", calculate_kinetic_energy(body1, body0))
-    print("Momentum:      ", calculate_momentum(body1, body0))
+    #print("Momentum:      ", calculate_momentum(body1, body0))
     
     vis.update_geometry(body0.mesh)
     vis.update_geometry(body1.mesh)
