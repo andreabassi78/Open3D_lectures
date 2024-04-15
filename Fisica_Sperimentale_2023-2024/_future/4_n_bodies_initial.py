@@ -21,14 +21,14 @@ class Body:
         self.vel += self.acc *dt    
                
 vis = o3d.visualization.Visualizer()
-vis.create_window(width=512,height =512)
+vis.create_window(width=768,height =768)
 frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0])
 vis.add_geometry(frame)
 
 N_bodies = 5
 bodies = []
 for idx in range(N_bodies):
-    body = Body(radius = 0.1,
+    body = Body(radius = 0.05,
              color = np.array((0.9, 0.6, 0.0)),
              pos = np.random.uniform(low=-1,high=1,size=3),
              vel = np.random.uniform(low=-1,high=1,size=3),

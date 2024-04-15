@@ -14,8 +14,7 @@ class Body:
         self.acc = np.zeros(3)
         self.mass = mass
 
-    def move(self,dt):
-         
+    def move(self,dt):         
         dr = self.vel * dt
         self.mesh.translate(dr)
         self.pos += dr
@@ -31,10 +30,10 @@ def elastic_collision(b0,b1):
     b0.vel = b0.vel - ratio0 * np.dot(vrel,rrel) / distance**2 *rrel 
     b1.vel = b1.vel - ratio1 * np.dot(-vrel,-rrel) / distance**2 *(-rrel)
 
-def inelastic_collision(b0,b1,dt = 0.001):
-    # ball is working as a springs with frinction proportional to velocity                 
-    K = 300 # elastic constant (N/m)
-    B = 5 # damping
+def inelastic_collision(b0,b1,dt = 0.002):
+    # ball is working as a springs with a frinction proportional to velocity                 
+    K = 10 # elastic constant (N/m)
+    B = 5 # damping (Ns/m)
     vrel = b0.vel - b1.vel
     rrel = b0.pos - b1.pos
     distance =  norm(rrel)
@@ -71,16 +70,25 @@ vis.add_geometry(frame)
 
 N_bodies = 20
 bodies = []
+vel_CM = np.zeros(3)
+
 for idx in range(N_bodies):
-    body = Body(radius = 0.1,
+    pos = np.random.uniform(low=-1,high=1,size=3)
+    
+    if idx == N_bodies-1:
+        vel = -vel_CM # this is to have a total momentum of the system equal to zero
+    else:
+        vel = np.random.uniform(low=-1,high=1,size=3)
+        vel_CM += vel 
+    body = Body(radius = 0.05,
              color = np.array((0.9, 0.6, 0.0)),
-             pos = np.random.uniform(low=-1,high=1,size=3),
-             vel = np.random.uniform(low=-1,high=1,size=3),
+             pos = pos,
+             vel = vel,
              mass = 1.0
             )
+    
     vis.add_geometry(body.mesh)
     bodies.append(body) 
-
 
 N = 1000 # number of frames in the movie
 dt = 0.002
@@ -97,7 +105,7 @@ for i in range(N):
             if body is not other_body:
                 r = body.pos - other_body.pos
                 if norm(r) < (body.radius + other_body.radius):
-                    elastic_collision(body, other_body) 
+                     inelastic_collision(body, other_body) 
                 else:
                     u_r = r/norm(r) # unit vector of the force
                     body.acc += - u_r * G * other_body.mass /norm(r)**2 # acceleration given by gravitational like field           
@@ -107,7 +115,7 @@ for i in range(N):
         vis.update_geometry(body.mesh)
 
     print("Total momentum:", calculate_momentum(bodies))
-
+    #print("Total kinetic energy:", calculate_kinetic_energy(bodies))
     vis.poll_events()
     vis.update_renderer()
 
