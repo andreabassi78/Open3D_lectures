@@ -6,16 +6,6 @@ YELLOW = np.array((0.7,0.6,0.0))
 BLUE = np.array((0.0,0.6,0.8))
 
 
-def completely_inelastic_collision(b0,b1):
-    .....
-
-    b0.vel = .....
-    b1.vel = ....
-
-
-
-
-
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
         self.radius = radius
@@ -65,7 +55,7 @@ for i in range(N):
 
     distance = body0.pos - body1.pos
     if norm(distance) < (body0.radius+body1.radius):
-        completely_inelastic_collision(body0,body1)
+        print('collision!')
     
     vis.update_geometry(body0.mesh)
     vis.update_geometry(body1.mesh)

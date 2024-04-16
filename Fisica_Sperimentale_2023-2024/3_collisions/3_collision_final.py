@@ -13,6 +13,7 @@ def completely_inelastic_collision(b0,b1):
     b0.vel = vm
     b1.vel = vm
 
+
 def elastic_collision(b0,b1):
     vrel = b0.vel - b1.vel
     rrel = b0.pos - b1.pos
