@@ -5,16 +5,18 @@ from numpy.linalg import norm
 YELLOW = np.array((0.7,0.6,0.0))
 BLUE = np.array((0.0,0.6,0.8))
 
-
 def completely_inelastic_collision(b0,b1):
-    .....
+    m0 = b0.mass
+    m1 = b1.mass
+    p = m0 * b0.vel + m1 * b1.vel
+    vm = p / (m0+m1)
+    b0.vel = vm
+    b1.vel = vm
 
-    b0.vel = .....
-    b1.vel = ....
 
-
-
-
+def calculate_kinetic_energy(b0,b1):
+    K = 1/2 *b0.mass * norm(b0.vel)**2 + 1/2 * b1.mass * norm(b1.vel)**2
+    return K
 
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
@@ -66,6 +68,8 @@ for i in range(N):
     distance = body0.pos - body1.pos
     if norm(distance) < (body0.radius+body1.radius):
         completely_inelastic_collision(body0,body1)
+    
+    print("Kinetic energy", calculate_kinetic_energy(body0, body1))
     
     vis.update_geometry(body0.mesh)
     vis.update_geometry(body1.mesh)
