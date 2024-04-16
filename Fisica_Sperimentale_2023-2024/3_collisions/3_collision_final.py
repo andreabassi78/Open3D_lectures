@@ -13,6 +13,29 @@ def completely_inelastic_collision(b0,b1):
     b0.vel = vm
     b1.vel = vm
 
+def elastic_collision(b0,b1):
+    vrel = b0.vel - b1.vel
+    rrel = b0.pos - b1.pos
+    distance = norm(rrel)
+    ratio0 = 2 * b1.mass / (b0.mass + b1.mass)
+    ratio1 = 2 * b0.mass / (b0.mass + b1.mass)
+    b0.vel = b0.vel - ratio0 * np.dot(vrel,rrel) / distance**2 *rrel
+    b1.vel = b1.vel - ratio1 * np.dot(-vrel,-rrel) / distance **2 *(-rrel)
+
+
+def inelastic_collision(b0, b1, dt = 0.01):
+    # spheres are acting as sistem connected by a spring with friction proportional to the relative velocity
+    k = 100 # elastic constant (N/m)
+    B = 5 # damping constant (Ns/m)
+    vrel = b0.vel - b1.vel
+    rrel = b0.pos - b1.pos
+    distance = norm(rrel)
+    F = k * rrel / distance * (b0.radius+b1.radius-distance) - B * vrel
+    acc0 = F /b0.mass
+    acc1 = - F /b1.mass
+    b0.vel = b0.vel + acc0 * dt 
+    b1.vel = b1.vel + acc1 * dt
+
 
 def calculate_kinetic_energy(b0,b1):
     K = 1/2 *b0.mass * norm(b0.vel)**2 + 1/2 * b1.mass * norm(b1.vel)**2
@@ -57,7 +80,7 @@ vis.add_geometry(frame)
 vis.add_geometry(body0.mesh)
 vis.add_geometry(body1.mesh)
 
-N = 300 # number of frames in the movie
+N = 600 # number of frames in the movie
 dt = 0.01
 
 for i in range(N):
@@ -67,7 +90,7 @@ for i in range(N):
 
     distance = body0.pos - body1.pos
     if norm(distance) < (body0.radius+body1.radius):
-        completely_inelastic_collision(body0,body1)
+        inelastic_collision(body0,body1)
     
     print("Kinetic energy", calculate_kinetic_energy(body0, body1))
     
