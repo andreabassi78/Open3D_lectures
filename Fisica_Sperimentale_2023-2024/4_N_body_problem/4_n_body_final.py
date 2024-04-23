@@ -33,6 +33,12 @@ def inelastic_collision(b0,b1,dt = 0.002):
     b1.vel = b1.vel + acceleration1*dt    
 
 
+def calculate_momentum(bodies):
+
+    p = ......
+
+    return p
+
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
         self.radius = radius
@@ -57,7 +63,7 @@ vis.create_window(width=768,height =768)
 frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0])
 vis.add_geometry(frame)
 
-np.random.seed(123)
+np.random.seed(156)
 
 N_bodies = 20
 bodies = []
@@ -85,13 +91,16 @@ for i in range(N):
             if body is not other_body:
                 r = body.pos - other_body.pos
                 if norm(r) < body.radius+other_body.radius:
-                    inelastic_collision(body,other_body)
+                    completely_inelastic_collision(body,other_body)
                 else:
                     ur = r/norm(r)
                     body.acc += -ur * G * other_body.mass/norm(r)**2 # acceleration given by other body
 
+    for body in bodies:
         body.move(dt)
         vis.update_geometry(body.mesh)
+
+    print('Total momentum:', calculate_momentum(bodies) )
 
     vis.poll_events()
     vis.update_renderer()
