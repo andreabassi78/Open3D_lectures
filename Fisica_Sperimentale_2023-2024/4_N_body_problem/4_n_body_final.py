@@ -22,7 +22,7 @@ def completely_inelastic_collision(b0,b1):
 def inelastic_collision(b0,b1,dt = 0.002):
     # ball is working as a springs with a frinction proportional to velocity                 
     K = 10 # elastic constant (N/m)
-    B = 5 # damping (Ns/m)
+    B = 10 # damping (Ns/m)
     vrel = b0.vel - b1.vel
     rrel = b0.pos - b1.pos
     distance =  norm(rrel)
@@ -41,9 +41,11 @@ def calculate_momentum(bodies):
 
 def calculate_cm(bodies):
     m_tot = 0
+    r_tot = np.zeros(3)
     for body in bodies:
-        m_tot += body.mass 
-    cm = calculate_momentum(bodies)/m_tot 
+        m_tot += body.mass
+        r_tot += body.pos * body.mass 
+    cm = r_tot/m_tot 
     return cm
 
 
@@ -85,7 +87,7 @@ for idx in range(N_bodies):
     vis.add_geometry(body.mesh)
     bodies.append(body) 
 
-N = 2000 # number of frames in the movie
+N = 1000 # number of frames in the movie
 
 dt = 0.002
 
