@@ -59,7 +59,7 @@ vis.add_geometry(frame)
 
 np.random.seed(123)
 
-N_bodies = 5
+N_bodies = 20
 bodies = []
 for idx in range(N_bodies):
     body = Body(radius = 0.05,
@@ -84,8 +84,11 @@ for i in range(N):
         for other_body in bodies:
             if body is not other_body:
                 r = body.pos - other_body.pos
-                ur = r/norm(r)
-                body.acc += -ur * G * other_body.mass/norm(r)**2 # acceleration given by other body
+                if norm(r) < body.radius+other_body.radius:
+                    inelastic_collision(body,other_body)
+                else:
+                    ur = r/norm(r)
+                    body.acc += -ur * G * other_body.mass/norm(r)**2 # acceleration given by other body
 
         body.move(dt)
         vis.update_geometry(body.mesh)
