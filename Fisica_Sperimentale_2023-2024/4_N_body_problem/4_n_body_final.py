@@ -34,10 +34,18 @@ def inelastic_collision(b0,b1,dt = 0.002):
 
 
 def calculate_momentum(bodies):
-
-    p = ......
-
+    p = np.zeros(3, dtype=float)
+    for body in bodies:
+        p += body.mass * body.vel
     return p
+
+def calculate_cm(bodies):
+    m_tot = 0
+    for body in bodies:
+        m_tot += body.mass 
+    cm = calculate_momentum(bodies)/m_tot 
+    return cm
+
 
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
@@ -77,11 +85,16 @@ for idx in range(N_bodies):
     vis.add_geometry(body.mesh)
     bodies.append(body) 
 
-N = 500 # number of frames in the movie
+N = 2000 # number of frames in the movie
 
 dt = 0.002
 
 G = 1
+
+c_m = calculate_cm(bodies)
+tail = o3d.geometry.PointCloud()
+tail.points = o3d.utility.Vector3dVector([c_m]) 
+vis.add_geometry(tail)
 
 for i in range(N):   
 
@@ -91,7 +104,7 @@ for i in range(N):
             if body is not other_body:
                 r = body.pos - other_body.pos
                 if norm(r) < body.radius+other_body.radius:
-                    completely_inelastic_collision(body,other_body)
+                    inelastic_collision(body,other_body)
                 else:
                     ur = r/norm(r)
                     body.acc += -ur * G * other_body.mass/norm(r)**2 # acceleration given by other body
@@ -101,8 +114,13 @@ for i in range(N):
         vis.update_geometry(body.mesh)
 
     print('Total momentum:', calculate_momentum(bodies) )
+    # update tail showing the trajectory
+    c_m = calculate_cm(bodies)
+    tail.points.extend([c_m])
+    vis.update_geometry(tail)
 
     vis.poll_events()
     vis.update_renderer()
+
 
 vis.destroy_window()
