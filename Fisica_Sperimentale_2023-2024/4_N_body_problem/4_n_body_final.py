@@ -2,6 +2,37 @@ import open3d as o3d
 import numpy as np
 from numpy.linalg import norm
 
+def elastic_collision(b0,b1):
+    vrel = b0.vel - b1.vel
+    rrel = b0.pos - b1.pos
+    distance = norm(rrel)
+    ratio0 = 2 * b1.mass / (b0.mass + b1.mass) 
+    ratio1 = 2 * b0.mass / (b0.mass + b1.mass) 
+    b0.vel = b0.vel - ratio0 * np.dot(vrel,rrel) / distance**2 *rrel 
+    b1.vel = b1.vel - ratio1 * np.dot(-vrel,-rrel) / distance**2 *(-rrel)
+
+def completely_inelastic_collision(b0,b1):
+    m0 = b0.mass
+    m1 = b1.mass
+    p = m0 * b0.vel + m1 * b1.vel
+    vm =  p /(m0+m1)
+    b0.vel = vm
+    b1.vel = vm
+
+def inelastic_collision(b0,b1,dt = 0.002):
+    # ball is working as a springs with a frinction proportional to velocity                 
+    K = 10 # elastic constant (N/m)
+    B = 5 # damping (Ns/m)
+    vrel = b0.vel - b1.vel
+    rrel = b0.pos - b1.pos
+    distance =  norm(rrel)
+    F = + K * rrel / distance * (b0.radius+b1.radius-distance)  - B * vrel
+    acceleration0 = +F / b0.mass
+    acceleration1 = -F / b1.mass
+    b0.vel = b0.vel + acceleration0*dt
+    b1.vel = b1.vel + acceleration1*dt    
+
+
 class Body:
     def __init__(self, radius, color, pos, vel, mass):
         self.radius = radius
