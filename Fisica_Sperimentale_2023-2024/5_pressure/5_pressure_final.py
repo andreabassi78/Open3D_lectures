@@ -12,6 +12,7 @@ class Body:
         self.pos = pos    
         self.vel = vel
         self.acc = np.zeros(3)
+        #self.acc = np.array((0.0,-9.81,0.0))
         self.mass = mass
         #self.mesh = o3d.geometry.TriangleMesh.create_sphere(radius)
         #self.mesh.paint_uniform_color(color)
@@ -19,11 +20,11 @@ class Body:
         #self.mesh.compute_vertex_normals()
 
     def move(self,dt):
-        dv = self.acc *dt
-        self.vel += dv
         dr = self.vel * dt
         self.pos += dr
         #self.mesh.translate(dr) 
+        dv = self.acc *dt
+        self.vel += dv
 
 def elastic_collision(b0,b1):
     vrel = b0.vel - b1.vel
@@ -63,10 +64,10 @@ vis.add_geometry(create_box(size=box_size))
 
 # Instantiate the molecules using the Body class
 
-N_molecules = 300
+N_molecules = 3000
 molecules = []
 for index in range(N_molecules):
-    pos = np.random.uniform(low=-1.0, high=1.0, size=3) 
+    pos = np.random.uniform(low=0.0, high=1.0, size=3) 
     vel = np.random.uniform(low=-1.0, high=1.0, size=3)
     molecule = Body(radius=0.00001, color=BLUE, pos=pos, vel=vel, mass=1.0)
     molecules.append(molecule)
@@ -83,9 +84,13 @@ N_frames = 2500 # number of frames in the movie
 dt = 0.01
 
 for frame in range(N_frames):
-
+    p = 0
     for i, molecule in enumerate(molecules): 
         molecule.move(dt)
+
+        if molecule.pos[1]<-box_size:
+            F = -2*molecule.mass*molecule.vel[1] /dt
+            p += F /4/box_size**2
 
         bounce(molecule, d=box_size)
         # for j in range(i + 1, len(molecules)):
@@ -95,6 +100,8 @@ for frame in range(N_frames):
         #         elastic_collision(molecule, other_molecule)
         xyz[i,:] = molecule.pos
     
+
+    print("pressure:", p)
     pcd.points = o3d.utility.Vector3dVector(xyz)
     
     vis.update_geometry(pcd)
