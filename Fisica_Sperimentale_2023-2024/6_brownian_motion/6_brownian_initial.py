@@ -66,7 +66,7 @@ vis.add_geometry(create_box(size=box_size))
 k = 1 # Boltzman's constant
 T = 1 # Temperature
 m = 1 # mass of the single atom
-N_molecules = 1000
+N_molecules = 100
 molecules = []
 for index in range(N_molecules):
     pos = np.random.uniform(low=-1.0, high=1.0, size=3)
@@ -90,11 +90,11 @@ for frame in range(N_frames):
     for i, molecule in enumerate(molecules): 
         molecule.move(dt)
         bounce(molecule, d=box_size)
-        # for j in range(i + 1, len(molecules)):
-        #     other_molecule = molecules[j]
-        #     r = molecule.pos - other_molecule.pos
-        #     if norm(r) < (molecule.radius + other_molecule.radius):
-        #         elastic_collision(molecule, other_molecule)
+        for j in range(i + 1, len(molecules)):
+            other_molecule = molecules[j]
+            r = molecule.pos - other_molecule.pos
+            if norm(r) < (molecule.radius + other_molecule.radius):
+                elastic_collision(molecule, other_molecule)
         xyz[i,:] = molecule.pos
     
     pcd.points = o3d.utility.Vector3dVector(xyz)
